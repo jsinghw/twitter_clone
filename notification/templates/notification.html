@@ -1,0 +1,20 @@
+<div>
+    <a href='/'>Home</a>
+    <a href='/tweet/add/'>Tweet</a>
+    <a href='/user/{{request.user.handle}}/notifications'>
+        Notifications:{{notifcation_count}} </a>
+    <a href='/user/{{request.user.handle}}'>My Profile</a>
+</div>
+
+<h1>Notifications</h1>
+
+{% for x in tweets %}
+<p>
+    <div>
+        {{x.tweet.profile}} | <a href='/tweet/detail/{{x.tweet.id}}'>{{x.tweet.date_created}}</a>
+    </div>
+    <div>
+        {{x.tweet.content}}
+    </div>
+</p>
+{% endfor %}

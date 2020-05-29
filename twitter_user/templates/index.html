@@ -1,0 +1,32 @@
+<div>
+    <a href='/'>Home</a>
+    <a href='/tweet/add/'>Tweet</a>
+    <a href='/user/{{request.user.handle}}/notifications'>
+        Notifications:{{notifcation_count}} </a>
+    <a href='/user/{{request.user.handle}}'>My Profile</a>
+</div>
+
+<h1>Homepage</h1>
+
+<div>
+    <h3>{{request.user.username}}</h3>
+    <div>{{request.user.handle}}</div>
+    <div>Tweets: {{tweet_count}} </div>
+    <div>Followers: {{followers_count}}</div>
+    <div>Following: {{following_count}}</div>
+    <a href='/logout/'>Logout</a>
+</div>
+
+<div>
+<h3>My Feed</h3>
+{% for x in feed %}
+    <p>
+        <div>
+            {{x.profile}} | <a href='/tweet/detail/{{x.id}}'>{{x.date_created}}</a>
+        </div>
+        <div>
+            {{x.content}}
+        </div>
+    </p>
+{% endfor %}
+</div>

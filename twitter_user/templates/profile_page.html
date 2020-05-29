@@ -1,0 +1,37 @@
+{% if request.user.is_authenticated %}
+    <div>
+        <a href='/'>Home</a>
+        <a href='/tweet/add/'>Tweet</a>
+        <a href='/user/{{request.user.handle}}/notifications'>
+            Notifications:{{notifcation_count}} </a>
+            <a href='/user/{{request.user.handle}}'>My Profile</a>
+        </div>
+{% endif %}
+
+<h1>Profile</h1>
+
+<div>
+    <h3>{{data.username}}</h3>
+    <div>{{data.handle}}</div>
+    <div>Tweets: {{tweet_count}} </div>
+    <div>Followers: {{followers_count}}</div>
+    <div>Following: {{following_count}}</div>
+    {% if request.user.handle == data.handle %}
+        <a href='/logout/'>Logout</a>
+    {% elif following == False %}
+        <a href='/user/follow/{{data.handle}}/'>Follow</a>
+    {% else %}
+        <a href='/user/unfollow/{{data.handle}}'>Unfollow</a>
+    {% endif %}
+</div>
+<h4>My Tweets</h4>
+{% for x in tweets %}
+    <p>
+        <div>
+            {{x.profile}} | <a href='/tweet/detail/{{x.id}}'>{{x.date_created}}</a>
+        </div>
+        <div>
+            {{x.content}}
+        </div>
+    </p>
+{% endfor %}
