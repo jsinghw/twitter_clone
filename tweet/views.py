@@ -38,13 +38,19 @@ def add_tweet(request):
     )
 
 
-@login_required
 def detail_tweet(request, id):
     html = 'detail_tweet.html'
     data = Tweet.objects.get(id=id)
-    notifcation_count = Notification.objects.filter(user=request.user).count()
-    return render(
-        request,
-        html,
-        {'data': data, 'notifcation_count': notifcation_count}
-    )
+    if request.user.is_authenticated:
+        notifcation_count = Notification.objects.filter(user=request.user).count()
+        return render(
+            request,
+            html,
+            {'data': data, 'notifcation_count': notifcation_count}
+        )
+    else:
+        return render(
+            request,
+            html,
+            {'data': data}
+        )

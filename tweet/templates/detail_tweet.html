@@ -1,10 +1,12 @@
-<div>
-    <a href='/'>Home</a>
-    <a href='/tweet/add/'>Tweet</a>
-    <a href='/user/{{request.user.handle}}/notifications'>
-        Notifications:{{notifcation_count}} </a>
-    <a href='/user/{{request.user.handle}}'>My Profile</a>
-</div>
+{% if request.user.is_authenticated %}
+    <div>
+        <a href='/'>Home</a>
+        <a href='/tweet/add/'>Tweet</a>
+        <a href='/user/{{request.user.handle}}/notifications'>
+            Notifications:{{notifcation_count}} </a>
+        <a href='/user/{{request.user.handle}}'>My Profile</a>
+    </div>
+{% endif %}
 
 <h1>Detailed Tweet</h1>
 
