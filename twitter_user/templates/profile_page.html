@@ -13,9 +13,9 @@
 <div>
     <h3>{{data.username}}</h3>
     <div>{{data.handle}}</div>
-    <div>Tweets: {{tweet_count}} </div>
-    <div>Followers: {{followers_count}}</div>
-    <div>Following: {{following_count}}</div>
+    <div>Tweets: {{tweets.count}} </div>
+    <div>Followers: {{data.followers.count}}</div>
+    <div>Following: {{data.following.count}}</div>
     {% if request.user.is_authenticated %}
         {% if request.user.handle == data.handle %}
             <a href='/logout/'>Logout</a>

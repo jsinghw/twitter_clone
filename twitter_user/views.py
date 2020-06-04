@@ -2,33 +2,31 @@ from django.shortcuts import render, reverse, HttpResponseRedirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from twitter_user.forms import SignUpForm
-from twitter_user.models import Profile, Follow
+from twitter_user.models import Profile
 from tweet.models import Tweet
 from notification.models import Notification
 
 # Create your views here.
 @login_required
 def index(request):
+    data = Profile.objects.get(id=request.user.id)
     tweet_count = Tweet.objects.filter(
         profile=request.user).count()
-    following_count = Follow.objects.filter(user=request.user).count()
-    followers_count = Follow.objects.filter(follow_user=request.user).count()
     notifcation_count = Notification.objects.filter(user=request.user).count()
 
     feed = Tweet.objects.filter(
         profile=request.user)
-    follower_list = Follow.objects.filter(user=request.user)
+    follower_list = Profile.objects.filter(following_other=request.user)
     for x in follower_list:
-        feed |= Tweet.objects.filter(profile=x.follow_user)
+        feed |= Tweet.objects.filter(profile=x.id)
     feed = feed.order_by('-date_created')
 
     return render(
         request,
         'index.html',
         {
+            'data': data,
             'tweet_count': tweet_count,
-            'following_count': following_count,
-            'followers_count': followers_count,
             'feed': feed,
             'notifcation_count': notifcation_count
         }
@@ -53,59 +51,59 @@ def profile_page(request, handle):
     html = 'profile_page.html'
     data = Profile.objects.get(handle=handle)
     tweets = Tweet.objects.filter(
-        profile=Profile.objects.get(handle=handle)).order_by('-date_created')
-    tweet_count = tweets.count()
-    following_count = Follow.objects.filter(
-        user=Profile.objects.get(handle=handle)).count()
-    followers_count = Follow.objects.filter(
-        follow_user=Profile.objects.get(handle=handle)).count()
+        profile=Profile.objects.get(handle=handle)
+    ).order_by('-date_created')
+
     if request.user.is_authenticated:
-        if Follow.objects.filter(
-                user=request.user, follow_user=Profile.objects.get(handle=handle)):
-            notifcation_count = Notification.objects.filter(user=request.user).count()
+        notification_count = Notification.objects.filter(user=request.user).count()
+        if Profile.objects.filter(handle=request.user.handle, following_user=data.id):
             following = True
         else:
             following = False
-    if request.user.is_authenticated:
         return render(
             request,
             html,
-            {
-                'data': data,
-                'tweets': tweets,
-                'tweet_count': tweet_count,
-                'following': following,
-                'following_count': following_count,
-                'followers_count': followers_count,
-                'notifcation_count': notifcation_count
-            })
+            {'data': data,
+             'tweets': tweets,
+             'notifcation_count': notification_count,
+             'following': following
+             }
+        )
     else:
         return render(
             request,
             html,
-            {
-                'data': data,
-                'tweets': tweets,
-                'tweet_count': tweet_count,
-                'following_count': following_count,
-                'followers_count': followers_count
-            })
+            {'data': data,
+             'tweets': tweets,
+             'following': following
+             }
+        )
 
 
 @login_required
 def follow(request, handle):
     url = reverse('profile', kwargs={'handle': handle})
-    new_follow = Follow(
-        user=request.user, follow_user=Profile.objects.get(handle=handle)
-    )
-    new_follow.save()
+    new_follower = Profile.objects.get(
+        handle=handle)
+    new_follower.following_other.add(request.user)
+    new_follower.save()
+
+    new_following = Profile.objects.get(
+        handle=request.user.handle)
+    new_following.following_user.add(
+        Profile.objects.get(handle=handle))
+    new_following.save()
     return HttpResponseRedirect(url)
 
 
 @login_required
 def unfollow(request, handle):
     url = reverse('profile', kwargs={'handle': handle})
-    stop_follow = Follow.objects.filter(
-        user=request.user, follow_user=Profile.objects.get(handle=handle))
-    stop_follow.delete()
+    stop_follower = Profile.objects.get(handle=handle)
+    stop_follower.following_other.remove(request.user)
+
+    stop_following = Profile.objects.get(
+        handle=request.user.handle)
+    stop_following.following_user.remove(
+        Profile.objects.get(handle=handle))
     return HttpResponseRedirect(url)
