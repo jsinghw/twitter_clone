@@ -12,8 +12,8 @@
     <h3>{{request.user.username}}</h3>
     <div>{{request.user.handle}}</div>
     <div>Tweets: {{tweet_count}} </div>
-    <div>Followers: {{followers_count}}</div>
-    <div>Following: {{following_count}}</div>
+    <div>Followers: {{data.followers.count}}</div>
+    <div>Following: {{data.following.count}}</div>
     <a href='/logout/'>Logout</a>
 </div>
 
