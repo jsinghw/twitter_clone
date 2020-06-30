@@ -122,8 +122,7 @@ def profile_page(request, handle):
             request,
             html,
             {'data': data,
-             'tweets': tweets,
-             'following': following
+             'tweets': tweets
              }
         )
 
